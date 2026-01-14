@@ -137,4 +137,62 @@ class BookingControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    @DisplayName("Should get paginated bookings with valid token")
+    void getBookingsPaged_Authenticated() throws Exception {
+        // Register and get token
+        RegisterRequest request = RegisterRequest.builder()
+                .username("pageduser")
+                .password("password123")
+                .build();
+
+        String response = mockMvc.perform(post("/api/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        String token = objectMapper.readTree(response).get("token").asText();
+
+        // Get paginated bookings
+        mockMvc.perform(get("/api/bookings/paged")
+                        .header("Authorization", "Bearer " + token)
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.pageable").exists())
+                .andExpect(jsonPath("$.totalElements").exists())
+                .andExpect(jsonPath("$.totalPages").exists());
+    }
+
+    @Test
+    @DisplayName("Should get paginated bookings with custom sorting")
+    void getBookingsPaged_WithSorting() throws Exception {
+        // Register and get token
+        RegisterRequest request = RegisterRequest.builder()
+                .username("sorteduser")
+                .password("password123")
+                .build();
+
+        String response = mockMvc.perform(post("/api/users/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        String token = objectMapper.readTree(response).get("token").asText();
+
+        // Get paginated bookings with custom sorting
+        mockMvc.perform(get("/api/bookings/paged")
+                        .header("Authorization", "Bearer " + token)
+                        .param("page", "0")
+                        .param("size", "5")
+                        .param("sortBy", "startDate")
+                        .param("sortDir", "asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.size").value(5));
+    }
 }

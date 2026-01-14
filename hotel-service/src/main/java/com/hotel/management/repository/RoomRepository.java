@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Sort;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -13,6 +15,10 @@ import java.util.List;
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     List<Room> findByHotelId(Long hotelId);
+
+    List<Room> findByHotelId(Long hotelId, Sort sort);
+
+    List<Room> findAll(Sort sort);
 
     @Query("""
         SELECT r FROM Room r

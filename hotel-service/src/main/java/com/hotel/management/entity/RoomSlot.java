@@ -6,6 +6,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -18,7 +19,9 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "room_slots")
+@Table(name = "room_slots", indexes = {
+        @Index(name = "idx_room_slot_dates", columnList = "room_id, start_date, end_date")
+})
 @Getter
 @Setter
 @NoArgsConstructor

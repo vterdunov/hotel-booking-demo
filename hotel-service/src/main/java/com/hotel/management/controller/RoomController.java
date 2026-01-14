@@ -4,6 +4,7 @@ import com.hotel.management.dto.ConfirmAvailabilityRequest;
 import com.hotel.management.dto.CreateRoomRequest;
 import com.hotel.management.dto.ReleaseRequest;
 import com.hotel.management.dto.RoomDto;
+import com.hotel.management.dto.RoomStatisticsDto;
 import com.hotel.management.service.RoomService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -46,6 +47,16 @@ public class RoomController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(roomService.getRecommendedRooms(startDate, endDate));
+    }
+
+    @GetMapping("/statistics")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get room occupancy statistics (ADMIN only)")
+    public ResponseEntity<List<RoomStatisticsDto>> getRoomStatistics(
+            @RequestParam(required = false) Long hotelId,
+            @RequestParam(defaultValue = "timesBooked") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        return ResponseEntity.ok(roomService.getRoomStatistics(hotelId, sortBy, sortDir));
     }
 
     @GetMapping("/{id}")

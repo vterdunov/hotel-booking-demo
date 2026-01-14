@@ -25,6 +25,7 @@ services:
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - EUREKA_INSTANCE_PREFER-IP-ADDRESS=true
+      - DATA_INIT_ENABLED=true
     depends_on:
       eureka-server:
         condition: service_healthy

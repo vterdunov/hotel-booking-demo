@@ -245,4 +245,94 @@ class RoomControllerIntegrationTest {
                         .param("endDate", endDate.toString()))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("Should get room statistics as admin")
+    void getRoomStatistics_AsAdmin() throws Exception {
+        // Create hotel and room first
+        CreateHotelRequest hotelRequest = CreateHotelRequest.builder()
+                .name("Statistics Test Hotel")
+                .address("123 Test Street")
+                .build();
+
+        String hotelResponse = mockMvc.perform(post("/api/hotels")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(hotelRequest)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        Long hotelId = objectMapper.readTree(hotelResponse).get("id").asLong();
+
+        // Create rooms
+        for (int i = 1; i <= 3; i++) {
+            CreateRoomRequest roomRequest = CreateRoomRequest.builder()
+                    .hotelId(hotelId)
+                    .number("10" + i)
+                    .build();
+
+            mockMvc.perform(post("/api/rooms")
+                            .header("Authorization", "Bearer " + adminToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(roomRequest)))
+                    .andExpect(status().isCreated());
+        }
+
+        // Get statistics
+        mockMvc.perform(get("/api/rooms/statistics")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].roomId").exists())
+                .andExpect(jsonPath("$[0].hotelName").value("Statistics Test Hotel"))
+                .andExpect(jsonPath("$[0].timesBooked").exists())
+                .andExpect(jsonPath("$[0].occupancyRate").exists());
+    }
+
+    @Test
+    @DisplayName("Should get room statistics filtered by hotel")
+    void getRoomStatistics_FilteredByHotel() throws Exception {
+        // Create hotel
+        CreateHotelRequest hotelRequest = CreateHotelRequest.builder()
+                .name("Filtered Hotel")
+                .address("456 Filter Street")
+                .build();
+
+        String hotelResponse = mockMvc.perform(post("/api/hotels")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(hotelRequest)))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+
+        Long hotelId = objectMapper.readTree(hotelResponse).get("id").asLong();
+
+        // Create room
+        CreateRoomRequest roomRequest = CreateRoomRequest.builder()
+                .hotelId(hotelId)
+                .number("201")
+                .build();
+
+        mockMvc.perform(post("/api/rooms")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(roomRequest)))
+                .andExpect(status().isCreated());
+
+        // Get statistics filtered by hotelId
+        mockMvc.perform(get("/api/rooms/statistics")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .param("hotelId", hotelId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].hotelId").value(hotelId));
+    }
+
+    @Test
+    @DisplayName("Should deny statistics access for regular user")
+    void getRoomStatistics_AsUser_Forbidden() throws Exception {
+        mockMvc.perform(get("/api/rooms/statistics")
+                        .header("Authorization", "Bearer " + userToken))
+                .andExpect(status().isForbidden());
+    }
 }

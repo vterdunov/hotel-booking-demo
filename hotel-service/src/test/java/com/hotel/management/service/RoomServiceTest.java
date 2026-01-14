@@ -19,6 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,7 +103,8 @@ class RoomServiceTest {
 
         when(roomSlotRepository.findByRequestId("req-123")).thenReturn(Optional.empty());
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
-        when(roomSlotRepository.existsOverlappingSlot(any(), any(), any())).thenReturn(false);
+        when(roomSlotRepository.findOverlappingSlotsWithLock(any(), any(), any()))
+                .thenReturn(Collections.emptyList());
 
         boolean result = roomService.confirmAvailability(1L, request);
 
@@ -143,9 +146,18 @@ class RoomServiceTest {
                 .requestId("req-123")
                 .build();
 
+        RoomSlot existingSlot = RoomSlot.builder()
+                .id(2L)
+                .room(room)
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusDays(3))
+                .requestId("existing-req")
+                .build();
+
         when(roomSlotRepository.findByRequestId("req-123")).thenReturn(Optional.empty());
         when(roomRepository.findById(1L)).thenReturn(Optional.of(room));
-        when(roomSlotRepository.existsOverlappingSlot(any(), any(), any())).thenReturn(true);
+        when(roomSlotRepository.findOverlappingSlotsWithLock(any(), any(), any()))
+                .thenReturn(List.of(existingSlot));
 
         boolean result = roomService.confirmAvailability(1L, request);
 

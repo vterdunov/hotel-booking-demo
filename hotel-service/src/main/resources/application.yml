@@ -37,6 +37,8 @@ springdoc:
 logging:
   level:
     com.hotel.management: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 
 management:
   endpoints:
@@ -46,3 +48,10 @@ management:
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0
+
+app:
+  data:
+    init-enabled: ${DATA_INIT_ENABLED:false}

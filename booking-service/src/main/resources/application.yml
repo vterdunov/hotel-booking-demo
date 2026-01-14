@@ -49,6 +49,8 @@ app:
 logging:
   level:
     com.hotel.booking: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
 
 management:
   endpoints:
@@ -58,3 +60,6 @@ management:
   endpoint:
     health:
       show-details: always
+  tracing:
+    sampling:
+      probability: 1.0

@@ -158,6 +158,7 @@ mvn spring-boot:run
 |-------|-----|----------|
 | POST | /api/bookings | Создать бронирование |
 | GET | /api/bookings | История бронирований |
+| GET | /api/bookings/paged | История бронирований с пагинацией |
 | GET | /api/bookings/{id} | Получить бронирование |
 | DELETE | /api/bookings/{id} | Отменить бронирование |
 
@@ -178,6 +179,7 @@ mvn spring-boot:run
 |-------|-----|----------|--------|
 | GET | /api/rooms?startDate=&endDate= | Свободные номера | USER |
 | GET | /api/rooms/recommend?startDate=&endDate= | Рекомендованные номера | USER |
+| GET | /api/rooms/statistics | Статистика загруженности номеров | ADMIN |
 | POST | /api/rooms | Создать номер | ADMIN |
 | POST | /api/rooms/{id}/confirm-availability | Подтвердить доступность | INTERNAL |
 | POST | /api/rooms/{id}/release | Освободить слот | INTERNAL |
@@ -343,14 +345,31 @@ cd booking-service && mvn test
 | rooms | id, hotel_id, number, available, times_booked |
 | room_slots | id, room_id, start_date, end_date, request_id, confirmed |
 
-## Логирование
+## Логирование и трассировка
+
+### Корреляция запросов
 
 Для отслеживания процесса бронирования используется корреляционный идентификатор (`requestId`), который передается между сервисами и логируется на каждом этапе.
 
+### Распределённая трассировка
+
+Интегрирован Micrometer Tracing с Brave для отслеживания запросов между сервисами:
+- `traceId` и `spanId` добавляются в логи автоматически
+- Формат логов: `[service-name,traceId,spanId]`
+
 Пример логов:
 ```
-Creating booking for user 1 with request: CreateBookingRequest(...)
-Created PENDING booking 1 with requestId abc-123
-Confirming availability for room 1 with requestId abc-123
-Booking 1 confirmed successfully
+INFO [booking-service,abc123,def456] Creating booking for user 1
+INFO [hotel-service,abc123,ghi789] Confirming availability for room 1
+```
+
+## Предзаполнение данных
+
+При запуске через Docker Compose автоматически создаются демо-данные:
+- 3 отеля с номерами
+- Всего 17 номеров для тестирования
+
+Для локального запуска:
+```bash
+DATA_INIT_ENABLED=true mvn spring-boot:run -pl hotel-service
 ```

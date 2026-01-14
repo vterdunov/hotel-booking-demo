@@ -29,6 +29,7 @@
         <spring-cloud.version>2025.0.0</spring-cloud.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <micrometer-tracing.version>1.4.4</micrometer-tracing.version>
     </properties>
 
     <dependencyManagement>

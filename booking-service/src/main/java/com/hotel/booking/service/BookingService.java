@@ -13,6 +13,8 @@ import com.hotel.booking.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,6 +118,12 @@ public class BookingService {
     @Transactional(readOnly = true)
     public List<BookingDto> getUserBookings(Long userId) {
         return bookingMapper.toDtoList(bookingRepository.findByUserId(userId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<BookingDto> getUserBookings(Long userId, Pageable pageable) {
+        return bookingRepository.findByUserId(userId, pageable)
+                .map(bookingMapper::toDto);
     }
 
     @Transactional(readOnly = true)
