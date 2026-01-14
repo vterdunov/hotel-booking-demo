@@ -294,6 +294,10 @@ cd hotel-service && mvn test
 cd booking-service && mvn test
 ```
 
+### CI
+
+Настроен GitHub Actions для автоматического запуска тестов при push и pull request в ветку `main`.
+
 ## Особенности реализации
 
 ### JWT аутентификация
