@@ -26,7 +26,7 @@
 
     <properties>
         <java.version>23</java.version>
-        <spring-cloud.version>2024.0.0</spring-cloud.version>
+        <spring-cloud.version>2025.0.0</spring-cloud.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jjwt.version>0.12.6</jjwt.version>
     </properties>

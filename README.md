@@ -62,6 +62,40 @@ docker compose down
 - Swagger Hotel Service: http://localhost:8082/swagger-ui.html
 - Swagger Booking Service: http://localhost:8081/swagger-ui.html
 
+## Конфигурация администратора
+
+Создание дефолтного администратора настраивается через переменные окружения:
+
+| Переменная | Описание | По умолчанию |
+|------------|----------|--------------|
+| `ADMIN_ENABLED` | Включить создание админа | `false` |
+| `ADMIN_USERNAME` | Имя пользователя | `admin` |
+| `ADMIN_PASSWORD` | Пароль (обязателен) | - |
+
+### Docker Compose
+
+В `docker-compose.yml` уже настроены переменные для booking-service:
+
+```yaml
+environment:
+  - ADMIN_ENABLED=true
+  - ADMIN_USERNAME=admin
+  - ADMIN_PASSWORD=admin123
+```
+
+### Локальный запуск
+
+```bash
+ADMIN_ENABLED=true ADMIN_PASSWORD=secret123 mvn spring-boot:run -pl booking-service
+```
+
+### Production
+
+В production рекомендуется:
+- Использовать сложный пароль
+- Передавать пароль через секреты (Docker Secrets, Kubernetes Secrets, Vault)
+- Отключить создание админа после первичной настройки (`ADMIN_ENABLED=false`)
+
 ## Запуск локально (без Docker)
 
 ### 1. Сборка проекта
