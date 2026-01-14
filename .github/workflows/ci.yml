@@ -22,8 +22,21 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Build with Maven
-      run: mvn clean install -B
+    - name: Verify environment
+      run: |
+        java -version
+        mvn -version
 
-    - name: Run tests
-      run: mvn test -B
+    - name: Build and test
+      run: mvn clean verify -B
+      continue-on-error: false
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          **/target/surefire-reports
+          **/target/failsafe-reports
+        retention-days: 7
