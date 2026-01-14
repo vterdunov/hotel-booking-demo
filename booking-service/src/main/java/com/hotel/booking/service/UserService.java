@@ -22,13 +22,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    @Override
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -50,6 +51,7 @@ public class UserService {
                 .build();
     }
 
+    @Override
     @Transactional(readOnly = true)
     public AuthResponse authenticate(AuthRequest request) {
         User user = userRepository.findByUsername(request.getUsername())
@@ -67,6 +69,7 @@ public class UserService {
                 .build();
     }
 
+    @Override
     @Transactional
     public UserDto createUser(CreateUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -83,6 +86,7 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+    @Override
     @Transactional
     public UserDto updateUser(Long id, UpdateUserRequest request) {
         User user = userRepository.findById(id)
@@ -107,6 +111,7 @@ public class UserService {
         return userMapper.toDto(user);
     }
 
+    @Override
     @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
@@ -115,11 +120,13 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         return userMapper.toDtoList(userRepository.findAll());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public UserDto getUserById(Long id) {
         User user = userRepository.findById(id)

@@ -3,7 +3,7 @@ package com.hotel.booking.controller;
 import com.hotel.booking.dto.BookingDto;
 import com.hotel.booking.dto.CreateBookingRequest;
 import com.hotel.booking.security.UserPrincipal;
-import com.hotel.booking.service.BookingService;
+import com.hotel.booking.service.BookingServiceInterface;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +33,7 @@ import java.util.List;
 @Tag(name = "Bookings", description = "Booking management API")
 public class BookingController {
 
-    private final BookingService bookingService;
+    private final BookingServiceInterface bookingService;
 
     @PostMapping
     @Operation(summary = "Create a new booking")

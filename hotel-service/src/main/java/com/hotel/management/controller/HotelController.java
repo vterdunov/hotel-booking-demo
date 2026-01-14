@@ -2,7 +2,7 @@ package com.hotel.management.controller;
 
 import com.hotel.management.dto.CreateHotelRequest;
 import com.hotel.management.dto.HotelDto;
-import com.hotel.management.service.HotelService;
+import com.hotel.management.service.HotelServiceInterface;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -26,7 +26,7 @@ import java.util.List;
 @Tag(name = "Hotels", description = "Hotel management API")
 public class HotelController {
 
-    private final HotelService hotelService;
+    private final HotelServiceInterface hotelService;
 
     @GetMapping
     @Operation(summary = "Get all hotels")

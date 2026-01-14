@@ -25,28 +25,32 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RoomService {
+public class RoomService implements RoomServiceInterface {
 
     private final RoomRepository roomRepository;
     private final RoomSlotRepository roomSlotRepository;
     private final HotelRepository hotelRepository;
     private final RoomMapper roomMapper;
 
+    @Override
     @Transactional(readOnly = true)
     public List<RoomDto> getAllRooms() {
         return roomMapper.toDtoList(roomRepository.findAll());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<RoomDto> getAvailableRooms(LocalDate startDate, LocalDate endDate) {
         return roomMapper.toDtoList(roomRepository.findAvailableRooms(startDate, endDate));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<RoomDto> getRecommendedRooms(LocalDate startDate, LocalDate endDate) {
         return roomMapper.toDtoList(roomRepository.findRecommendedRooms(startDate, endDate));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public RoomDto getRoomById(Long id) {
         Room room = roomRepository.findById(id)
@@ -54,6 +58,7 @@ public class RoomService {
         return roomMapper.toDto(room);
     }
 
+    @Override
     @Transactional
     public RoomDto createRoom(CreateRoomRequest request) {
         Hotel hotel = hotelRepository.findById(request.getHotelId())
@@ -71,6 +76,7 @@ public class RoomService {
         return roomMapper.toDto(room);
     }
 
+    @Override
     @Transactional
     public boolean confirmAvailability(Long roomId, ConfirmAvailabilityRequest request) {
         log.info("Confirming availability for room {} with requestId {}",
@@ -121,6 +127,7 @@ public class RoomService {
         return true;
     }
 
+    @Override
     @Transactional
     public void releaseSlot(String requestId) {
         log.info("Releasing slot with requestId {}", requestId);
@@ -144,6 +151,7 @@ public class RoomService {
         log.info("Successfully released slot with requestId {}", requestId);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<RoomStatisticsDto> getRoomStatistics(Long hotelId, String sortBy, String sortDir) {
         log.info("Getting room statistics for hotelId: {}, sortBy: {}, sortDir: {}",

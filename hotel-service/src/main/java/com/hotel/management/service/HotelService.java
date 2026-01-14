@@ -14,16 +14,18 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class HotelService {
+public class HotelService implements HotelServiceInterface {
 
     private final HotelRepository hotelRepository;
     private final HotelMapper hotelMapper;
 
+    @Override
     @Transactional(readOnly = true)
     public List<HotelDto> getAllHotels() {
         return hotelMapper.toDtoList(hotelRepository.findAll());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public HotelDto getHotelById(Long id) {
         Hotel hotel = hotelRepository.findById(id)
@@ -31,6 +33,7 @@ public class HotelService {
         return hotelMapper.toDto(hotel);
     }
 
+    @Override
     @Transactional
     public HotelDto createHotel(CreateHotelRequest request) {
         Hotel hotel = hotelMapper.toEntity(request);
@@ -38,6 +41,7 @@ public class HotelService {
         return hotelMapper.toDto(hotel);
     }
 
+    @Override
     @Transactional
     public void deleteHotel(Long id) {
         if (!hotelRepository.existsById(id)) {

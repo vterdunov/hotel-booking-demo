@@ -25,13 +25,14 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BookingService {
+public class BookingService implements BookingServiceInterface {
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final BookingMapper bookingMapper;
     private final HotelServiceClient hotelServiceClient;
 
+    @Override
     @Transactional
     public BookingDto createBooking(Long userId, CreateBookingRequest request, String authToken) {
         log.info("Creating booking for user {} with request: {}", userId, request);
@@ -115,17 +116,20 @@ public class BookingService {
         return bookingMapper.toDto(booking);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<BookingDto> getUserBookings(Long userId) {
         return bookingMapper.toDtoList(bookingRepository.findByUserId(userId));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<BookingDto> getUserBookings(Long userId, Pageable pageable) {
         return bookingRepository.findByUserId(userId, pageable)
                 .map(bookingMapper::toDto);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public BookingDto getBookingById(Long bookingId, Long userId) {
         Booking booking = bookingRepository.findByIdAndUserId(bookingId, userId)
@@ -134,6 +138,7 @@ public class BookingService {
         return bookingMapper.toDto(booking);
     }
 
+    @Override
     @Transactional
     public void cancelBooking(Long bookingId, Long userId, String authToken) {
         log.info("Cancelling booking {} for user {}", bookingId, userId);

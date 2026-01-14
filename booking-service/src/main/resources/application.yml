@@ -34,6 +34,20 @@ hotel-service:
   max-retries: 3
   timeout: 5000
 
+resilience4j:
+  circuitbreaker:
+    instances:
+      hotelService:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10000
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowType: COUNT_BASED
+  timelimiter:
+    instances:
+      hotelService:
+        timeoutDuration: 5s
+
 springdoc:
   api-docs:
     path: /v3/api-docs

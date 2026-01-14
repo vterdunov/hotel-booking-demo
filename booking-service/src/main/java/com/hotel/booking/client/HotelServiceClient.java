@@ -1,5 +1,6 @@
 package com.hotel.booking.client;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -11,12 +12,15 @@ import reactor.util.retry.Retry;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @Slf4j
 public class HotelServiceClient {
+
+    private static final String CIRCUIT_BREAKER_NAME = "hotelService";
 
     private final WebClient webClient;
     private final int maxRetries;
@@ -34,6 +38,7 @@ public class HotelServiceClient {
         this.timeout = Duration.ofMillis(timeoutMs);
     }
 
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getRecommendedRoomsFallback")
     public List<RoomDto> getRecommendedRooms(LocalDate startDate, LocalDate endDate, String authToken) {
         log.info("Fetching recommended rooms for dates {} - {}", startDate, endDate);
 
@@ -55,6 +60,7 @@ public class HotelServiceClient {
                 .block();
     }
 
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "confirmAvailabilityFallback")
     public boolean confirmAvailability(Long roomId, LocalDate startDate, LocalDate endDate,
                                        String requestId, String authToken) {
         log.info("Confirming availability for room {} with requestId {}", roomId, requestId);
@@ -100,6 +106,7 @@ public class HotelServiceClient {
         }
     }
 
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "releaseSlotFallback")
     public void releaseSlot(Long roomId, String requestId, String authToken) {
         log.info("Releasing slot for room {} with requestId {}", roomId, requestId);
 
@@ -126,6 +133,28 @@ public class HotelServiceClient {
 
     private boolean isRetryable(Throwable throwable) {
         return !(throwable instanceof RoomNotAvailableException);
+    }
+
+    @SuppressWarnings("unused")
+    private List<RoomDto> getRecommendedRoomsFallback(LocalDate startDate, LocalDate endDate,
+                                                      String authToken, Throwable t) {
+        log.error("CircuitBreaker fallback: getRecommendedRooms failed for dates {} - {}: {}",
+                startDate, endDate, t.getMessage());
+        return Collections.emptyList();
+    }
+
+    @SuppressWarnings("unused")
+    private boolean confirmAvailabilityFallback(Long roomId, LocalDate startDate, LocalDate endDate,
+                                                 String requestId, String authToken, Throwable t) {
+        log.error("CircuitBreaker fallback: confirmAvailability failed for room {} with requestId {}: {}",
+                roomId, requestId, t.getMessage());
+        throw new HotelServiceException("Hotel service unavailable: " + t.getMessage(), t);
+    }
+
+    @SuppressWarnings("unused")
+    private void releaseSlotFallback(Long roomId, String requestId, String authToken, Throwable t) {
+        log.error("CircuitBreaker fallback: releaseSlot failed for room {} with requestId {}: {}",
+                roomId, requestId, t.getMessage());
     }
 
     public static class HotelServiceException extends RuntimeException {

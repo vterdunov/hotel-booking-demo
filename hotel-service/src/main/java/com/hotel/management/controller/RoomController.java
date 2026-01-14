@@ -5,7 +5,7 @@ import com.hotel.management.dto.CreateRoomRequest;
 import com.hotel.management.dto.ReleaseRequest;
 import com.hotel.management.dto.RoomDto;
 import com.hotel.management.dto.RoomStatisticsDto;
-import com.hotel.management.service.RoomService;
+import com.hotel.management.service.RoomServiceInterface;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ import java.util.List;
 @Tag(name = "Rooms", description = "Room management API")
 public class RoomController {
 
-    private final RoomService roomService;
+    private final RoomServiceInterface roomService;
 
     @GetMapping
     @Operation(summary = "Get all available rooms for given dates")

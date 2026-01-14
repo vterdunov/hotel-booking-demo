@@ -6,7 +6,7 @@ import com.hotel.booking.dto.CreateUserRequest;
 import com.hotel.booking.dto.RegisterRequest;
 import com.hotel.booking.dto.UpdateUserRequest;
 import com.hotel.booking.dto.UserDto;
-import com.hotel.booking.service.UserService;
+import com.hotel.booking.service.UserServiceInterface;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -31,7 +31,7 @@ import java.util.List;
 @Tag(name = "Users", description = "User management API")
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceInterface userService;
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user")
