@@ -98,6 +98,17 @@ ADMIN_ENABLED=true ADMIN_PASSWORD=secret123 mvn spring-boot:run -pl booking-serv
 - Передавать пароль через секреты (Docker Secrets, Kubernetes Secrets, Vault)
 - Отключить создание админа после первичной настройки (`ADMIN_ENABLED=false`)
 
+## Предзаполнение данных
+
+При запуске через Docker Compose автоматически создаются демо-данные:
+- 3 отеля с номерами
+- Всего 17 номеров для тестирования
+
+Для локального запуска:
+```bash
+DATA_INIT_ENABLED=true mvn spring-boot:run -pl hotel-service
+```
+
 ## Запуск локально (без Docker)
 
 ### 1. Сборка проекта
@@ -361,15 +372,4 @@ cd booking-service && mvn test
 ```
 INFO [booking-service,abc123,def456] Creating booking for user 1
 INFO [hotel-service,abc123,ghi789] Confirming availability for room 1
-```
-
-## Предзаполнение данных
-
-При запуске через Docker Compose автоматически создаются демо-данные:
-- 3 отеля с номерами
-- Всего 17 номеров для тестирования
-
-Для локального запуска:
-```bash
-DATA_INIT_ENABLED=true mvn spring-boot:run -pl hotel-service
 ```
