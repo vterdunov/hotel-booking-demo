@@ -1,5 +1,7 @@
 # Система бронирования отелей
 
+![CI](https://github.com/vterdunov/hotel-booking-demo/actions/workflows/ci.yml/badge.svg)
+
 Микросервисная система бронирования отелей на базе Spring Boot 3.5.x с использованием Spring Cloud.
 
 ## Архитектура
